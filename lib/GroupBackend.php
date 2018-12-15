@@ -124,10 +124,15 @@ class GroupBackend extends ABackend {
 		$qb->select('uid')
 			->from($this->table)
 			->where($qb->expr()->eq('gid', $qb->createNamedParameter($gid)))
-			->andWhere($qb->expr()->iLike('uid', $qb->createPositionalParameter('%' . $this->db->escapeLikeParameter($search) . '%')))
 			->orderBy('uid', 'ASC')
 			->setMaxResults($limit)
 			->setFirstResult($offset);
+
+		if ($search !== '') {
+			$qb->andWhere($qb->expr()->iLike('uid', $qb->createNamedParameter(
+				'%' . $this->db->escapeLikeParameter($search) . '%'
+			)));
+		}
 
 		$result = $qb->execute()->fetchAll();
 		$users = array_column($result, 'uid');
