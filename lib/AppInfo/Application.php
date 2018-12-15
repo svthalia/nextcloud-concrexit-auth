@@ -35,7 +35,7 @@ class Application extends App {
             );
         });
 
-        $container->registerService('\OCA\ConcrexitAuth\Background\UpdateGroups', function($c) {
+        $container->registerService('OCA\ConcrexitAuth\Background\UpdateGroups', function($c) {
             return new UpdateGroups(
                 $c->query('Logger'),
                 $c->query('TimeFactory'),
@@ -43,7 +43,7 @@ class Application extends App {
             );
         });
 
-        $container->registerService('\OCA\ConcrexitAuth\Background\UpdateUsers', function($c) {
+        $container->registerService('OCA\ConcrexitAuth\Background\UpdateUsers', function($c) {
             return new UpdateUsers(
                 $c->query('Logger'),
                 $c->query('TimeFactory'),
