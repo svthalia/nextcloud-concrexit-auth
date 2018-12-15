@@ -217,7 +217,9 @@ class UserBackend extends ABackend implements ICheckPasswordBackend, IGetDisplay
 	public function updateUsers() {
 		$this->logger->debug('Updating users', array('app' => $this->appName));
 
-		$secret = $this->config->getSystemValue('concrexit', array('secret' => ''))['secret'];
+		$settings = $this->config->getSystemValue('concrexit', array());
+		$secret = isset($settings['secret']) ? $settings['secret'] : '';
+		$quota = isset($settings['quota']) ? $settings['quota'] : '100MB';
 		$result = ApiUtil::doRequest(
 			$this->host,
 			'activemembers/nextcloud/users',
@@ -243,7 +245,7 @@ class UserBackend extends ABackend implements ICheckPasswordBackend, IGetDisplay
 					if ($currentEmail !== $email) {
 						$userObj->setEMailAddress($email);
 					}
-					$userObj->setQuota('100MB');
+					$userObj->setQuota($quota);
 				}
 			}
 		} else {
