@@ -10,7 +10,7 @@ class UpdateGroupsJob extends TimedJob {
 
 	public function __construct() {
 		$this->logger = \OC::$server->getLogger();
-		$this->setInterval(60*15);
+		$this->setInterval(60 * 5);
 		$this->logger->debug('Init UpdateGroupsJob', array('app' => 'ConcrexitAuth'));
 	}
 
