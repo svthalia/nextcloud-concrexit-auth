@@ -67,7 +67,6 @@ class UserBackend extends ABackend implements ICheckPasswordBackend, IGetDisplay
 		$this->logger->debug('Checking password ' . $uid, array('app' => $this->appName));
 		$this->logger->debug('System value found: '. $this->config->getSystemValue('instanceid'));
 
-		var_dump($this->userExists($uid));
 		if ($this->userExists($uid)) {
 			$result = ApiUtil::doRequest(
 				$this->host,

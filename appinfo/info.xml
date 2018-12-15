@@ -3,6 +3,7 @@
       xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
     <id>concrexitauth</id>
     <name>Concrexit Auth</name>
+    <namespace>ConcrexitAuth</namespace>
     <version>1.0.0</version>
     <author mail="se_bastiaan@outlook.com" >Sébastiaan Versteeg</author>
     <category>security</category>
