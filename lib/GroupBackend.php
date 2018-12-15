@@ -1,7 +1,6 @@
 <?php
 namespace OCA\ConcrexitAuth;
 
-
 use OCP\Group\Backend\ABackend;
 use OCA\ConcrexitAuth\ApiUtil;
 
