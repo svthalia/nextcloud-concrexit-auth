@@ -16,7 +16,7 @@
         <prelogin/>
     </types>
     <background-jobs>
-        <job>OCA\ConcrexitAuth\UpdateGroupsJob</job>
-        <job>OCA\ConcrexitAuth\UpdateUsersJob</job>
+        <job>OCA\ConcrexitAuth\Background\UpdateGroups</job>
+        <job>OCA\ConcrexitAuth\Background\UpdateUsers</job>
     </background-jobs>
 </info>

@@ -5,8 +5,8 @@ namespace OCA\ConcrexitAuth\AppInfo;
 use \OCP\AppFramework\App;
 use \OCA\ConcrexitAuth\UserBackend;
 use \OCA\ConcrexitAuth\GroupBackend;
-use \OCA\ConcrexitAuth\UpdateGroupsJob;
-use \OCA\ConcrexitAuth\UpdateUsersJob;
+use \OCA\ConcrexitAuth\Background\UpdateGroups;
+use \OCA\ConcrexitAuth\Background\UpdateUsers;
 
 class Application extends App {
 
@@ -34,6 +34,22 @@ class Application extends App {
                 $c->query('AppName')
             );
         });
+
+        $container->registerService('\OCA\ConcrexitAuth\Background\UpdateGroups', function($c) {
+            return new UpdateGroups(
+                $c->query('Logger'),
+                $c->query('TimeFactory'),
+                $c->query('AppName')
+            );
+        });
+
+        $container->registerService('\OCA\ConcrexitAuth\Background\UpdateUsers', function($c) {
+            return new UpdateUsers(
+                $c->query('Logger'),
+                $c->query('TimeFactory'),
+                $c->query('AppName')
+            );
+        });
     }
 
     public function init() {
@@ -42,15 +58,8 @@ class Application extends App {
 
         $logger = $this->getContainer()->query('ServerContainer')->getLogger();
         $jobList = $this->getContainer()->query('ServerContainer')->getJobList();
-
-        if (!$jobList->has(UpdateGroupsJob::class, null)) {
-            $jobList->add(UpdateGroupsJob::class);
-            $this->logger->debug('Groups update job added', array('app' => $this->appName));
-        }
-        if (!$jobList->has(UpdateUsersJob::class, null)) {
-            $jobList->add(UpdateUsersJob::class);
-            $this->logger->debug('Users update job added', array('app' => $this->appName));
-        }
+        $jobList->add(UpdateGroups::class);
+        $jobList->add(UpdateUsers::class);
     }
 
 }
