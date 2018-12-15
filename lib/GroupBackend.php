@@ -80,7 +80,7 @@ class GroupBackend extends ABackend {
 	public function getGroups($search = '', $limit = -1, $offset = 0) {
 		$qb = $this->db->getQueryBuilder();
 
-		$qb->select('gid')
+		$qb->selectDistinct('gid')
 			->from($this->table)
 			->where($qb->expr()->iLike('gid', $qb->createPositionalParameter('%' . $this->db->escapeLikeParameter($search) . '%')))
 			->orderBy('gid', 'ASC')
