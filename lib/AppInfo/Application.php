@@ -6,6 +6,7 @@ use \OCP\AppFramework\App;
 use \OCA\ConcrexitAuth\UserBackend;
 use \OCA\ConcrexitAuth\GroupBackend;
 use \OCA\ConcrexitAuth\UpdateGroupsJob;
+use \OCA\ConcrexitAuth\UpdateUsersJob;
 
 class Application extends App {
 
@@ -38,6 +39,20 @@ class Application extends App {
     public function init() {
         $this->getContainer()->query('UserBackend')->init();
         $this->getContainer()->query('GroupBackend')->init();
+
+        $groupsJob = new UpdateGroupsJob();
+        $usersJob = new UpdateUsersJob();
+        $logger = $this->getContainer()->query('ServerContainer')->getLogger();
+        $jobList = $this->getContainer()->query('ServerContainer')->getJobList();
+
+        if (!$jobList->has($groupsJob, null)) {
+            $jobList->add($groupsJob);
+            $this->logger->debug('Groups update job added', array('app' => $this->appName));
+        }
+        if (!$jobList->has($usersJob, null)) {
+            $jobList->add($usersJob);
+            $this->logger->debug('Users update job added', array('app' => $this->appName));
+        }
     }
 
 }
