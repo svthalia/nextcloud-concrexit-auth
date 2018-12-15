@@ -243,7 +243,7 @@ class UserBackend extends ABackend implements ICheckPasswordBackend, IGetDisplay
 					if ($currentEmail !== $email) {
 						$userObj->setEMailAddress($email);
 					}
-					$userObj->setQuota('0B');
+					$userObj->setQuota('100MB');
 				}
 			}
 		} else {
