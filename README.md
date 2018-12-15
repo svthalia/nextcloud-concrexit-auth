@@ -11,3 +11,5 @@ Add the following to your `config.php`:
         'secret' => 'supersecretapitoken'
     ),
 ```
+
+And add the plugin code to your `custom_apps` folder. The plugin should be in a folder called `concrexitauth`.
