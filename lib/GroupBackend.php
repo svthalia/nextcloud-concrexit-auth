@@ -159,7 +159,9 @@ class GroupBackend extends ABackend {
 			foreach($groups as $group) {
 				$gid = $group->name;
 
-				foreach($group->members as $uid) {
+				$members = array_unique($group->members);
+
+				foreach($members as $uid) {
 					$qb = $this->db->getQueryBuilder();
 					$qb->insert($this->table)
 						->values([
