@@ -1,17 +1,20 @@
 <?php
 namespace OCA\ConcrexitAuth;
 
-use OC\BackgroundJob\TimedJob;
+use OCP\BackgroundJob\Job;
 use OCA\ConcrexitAuth\AppInfo\Application;
 
-class UpdateGroupsJob extends TimedJob {
+class UpdateGroupsJob extends Job {
 
 	protected $logger;
 
-	public function __construct() {
-		$this->logger = \OC::$server->getLogger();
-		$this->setInterval(60 * 5);
-		$this->logger->debug('Init UpdateGroupsJob', array('app' => 'ConcrexitAuth'));
+	/**
+	 * @param ILogger $logger
+	 * @param ITimeFactory $timeFactory
+	 */
+	public function __construct(ILogger $logger, ITimeFactory $timeFactory) {
+		parent::__construct($timeFactory);
+		$this->logger = $logger;
 	}
 
 	public function run($argument) {

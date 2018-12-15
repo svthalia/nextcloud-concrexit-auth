@@ -40,17 +40,15 @@ class Application extends App {
         $this->getContainer()->query('UserBackend')->init();
         $this->getContainer()->query('GroupBackend')->init();
 
-        $groupsJob = new UpdateGroupsJob();
-        $usersJob = new UpdateUsersJob();
         $logger = $this->getContainer()->query('ServerContainer')->getLogger();
         $jobList = $this->getContainer()->query('ServerContainer')->getJobList();
 
-        if (!$jobList->has($groupsJob, null)) {
-            $jobList->add($groupsJob);
+        if (!$jobList->has(UpdateGroupsJob::class, null)) {
+            $jobList->add(UpdateGroupsJob::class);
             $this->logger->debug('Groups update job added', array('app' => $this->appName));
         }
-        if (!$jobList->has($usersJob, null)) {
-            $jobList->add($usersJob);
+        if (!$jobList->has(UpdateUsersJob::class, null)) {
+            $jobList->add(UpdateUsersJob::class);
             $this->logger->debug('Users update job added', array('app' => $this->appName));
         }
     }
