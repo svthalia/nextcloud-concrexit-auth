@@ -45,11 +45,8 @@ class GroupBackend extends ABackend {
 			->from($this->table)
 			->where($qb->expr()->eq('uid', $qb->createNamedParameter($uid)))
 			->where($qb->expr()->eq('gid', $qb->createNamedParameter($gid)));
-
 		$result = $qb->execute();
-
-		$ret = (int) $result->fetch()['COUNT(*)'];
-		return $ret > 0;
+		return $result->fetchColumn() > 0;
 	}
 
 	/**
@@ -111,9 +108,7 @@ class GroupBackend extends ABackend {
 			->from($this->table)
 			->where($qb->expr()->eq('gid', $qb->createNamedParameter($gid)));
 		$result = $qb->execute();
-
-		$ret = (int) $result->fetch()['COUNT(*)'];
-		return $ret > 0;
+		return $result->fetchColumn() > 0;
 	}
 
 	/**

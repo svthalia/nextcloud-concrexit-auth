@@ -65,7 +65,6 @@ class UserBackend extends ABackend implements ICheckPasswordBackend, IGetDisplay
 	 */
 	public function checkPassword($uid, $password) {
 		$this->logger->debug('Checking password ' . $uid, array('app' => $this->appName));
-		$this->logger->debug('System value found: '. $this->config->getSystemValue('instanceid'));
 
 		if ($this->userExists($uid)) {
 			$result = ApiUtil::doRequest(
@@ -81,6 +80,8 @@ class UserBackend extends ABackend implements ICheckPasswordBackend, IGetDisplay
 			if ($result['status'] === 200) {
 				return $uid;
 			}
+		} else {
+			$this->logger->debug('User does not exist: ' . $uid, array('app' => $this->appName));
 		}
 
 		return false;
@@ -164,9 +165,7 @@ class UserBackend extends ABackend implements ICheckPasswordBackend, IGetDisplay
 			->from($this->table)
 			->where($qb->expr()->eq('uid', $qb->createNamedParameter($uid)));
 		$result = $qb->execute();
-
-		$ret = (int) $result->fetch()['COUNT(*)'];
-		return $ret > 0;
+		return $result->fetchColumn() > 0;
 	}
 
 	/**
