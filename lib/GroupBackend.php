@@ -149,7 +149,7 @@ class GroupBackend extends ABackend {
 		$secret = $this->config->getSystemValue('concrexit', array('secret' => ''))['secret'];
 		$result = ApiUtil::doRequest(
 			$this->host,
-			'activemembers/nextcloud/groups',
+			'activemembers/nextcloud/groups/',
 			array('Authorization: Secret ' . $secret)
 		);
 

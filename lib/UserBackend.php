@@ -222,7 +222,7 @@ class UserBackend extends ABackend implements ICheckPasswordBackend, IGetDisplay
 		$quota = isset($settings['quota']) ? $settings['quota'] : '100MB';
 		$result = ApiUtil::doRequest(
 			$this->host,
-			'activemembers/nextcloud/users',
+			'activemembers/nextcloud/users/',
 			array('Authorization: Secret ' . $secret)
 		);
 
