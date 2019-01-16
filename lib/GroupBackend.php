@@ -77,7 +77,7 @@ class GroupBackend extends ABackend {
 	 *
 	 * Returns a list with all groups
 	 */
-	public function getGroups($search = '', $limit = -1, $offset = 0) {
+	public function getGroups($search='', $limit=null, $offset=null) {
 		$qb = $this->db->getQueryBuilder();
 
 		$qb->selectDistinct('gid')
@@ -118,7 +118,7 @@ class GroupBackend extends ABackend {
 	 * @param int $offset
 	 * @return array an array of user ids
 	 */
-	public function usersInGroup($gid, $search = '', $limit = -1, $offset = 0) {
+	public function usersInGroup($gid, $search='', $limit=null, $offset=null) {
 		$qb = $this->db->getQueryBuilder();
 
 		$qb->select('uid')
