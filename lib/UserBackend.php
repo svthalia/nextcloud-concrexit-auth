@@ -249,7 +249,7 @@ class UserBackend extends ABackend implements ICheckPasswordBackend, IGetDisplay
 				}
 			}
 		} else {
-			$this->logger->debug('Updating users failed, error from server', array('app' => $this->appName));
+			$this->logger->error('Updating users failed, error from server', array('app' => $this->appName));
 		}
 	}
 }
