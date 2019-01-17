@@ -172,7 +172,7 @@ class GroupBackend extends ABackend {
 				}
 			}
 		} else {
-			$this->logger->debug('Updating groups failed, error from server', array('app' => $this->appName));
+			$this->logger->error('Updating groups failed, error from server', array('app' => $this->appName));
 		}
 	}
 
