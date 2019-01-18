@@ -3,6 +3,7 @@
 namespace OCA\ConcrexitAuth\AppInfo;
 
 use \OCP\AppFramework\App;
+use \OCP\Accounts\IAccountManager;
 use \OCA\ConcrexitAuth\UserBackend;
 use \OCA\ConcrexitAuth\GroupBackend;
 use \OCA\ConcrexitAuth\Background\UpdateGroups;
@@ -16,21 +17,22 @@ class Application extends App {
         $container = $this->getContainer();
         $container->registerService('UserBackend', function($c) {
             return new UserBackend(
-                $c->query('ServerContainer')->getConfig(),
-                $c->query('ServerContainer')->getUserManager(),
-                $c->query('ServerContainer')->getLogger(),
-                $c->query('ServerContainer')->getDatabaseConnection(),
+                $c->query('AllConfig'),
+                $c->query('UserManager'),
+                $c->query(IAccountManager::class),
+                $c->query('Logger'),
+                $c->query('DatabaseConnection'),
                 $c->query('AppName')
             );
         });
 
         $container->registerService('GroupBackend', function($c) {
             return new GroupBackend(
-                $c->query('ServerContainer')->getConfig(),
-                $c->query('ServerContainer')->getGroupManager(),
-                $c->query('ServerContainer')->getLogger(),
-                $c->query('ServerContainer')->getDatabaseConnection(),
-                $c->query('ServerContainer')->getJobList(),
+                $c->query('AllConfig'),
+                $c->query('GroupManager'),
+                $c->query('Logger'),
+                $c->query('DatabaseConnection'),
+                $c->query('JobList'),
                 $c->query('AppName')
             );
         });
