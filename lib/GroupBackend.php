@@ -77,7 +77,7 @@ class GroupBackend extends ABackend {
 	 *
 	 * Returns a list with all groups
 	 */
-	public function getGroups($search='', $limit=null, $offset=null) {
+	public function getGroups($search = '', $limit = null, $offset = null) {
 		$qb = $this->db->getQueryBuilder();
 
 		$qb->selectDistinct('gid')
@@ -118,7 +118,7 @@ class GroupBackend extends ABackend {
 	 * @param int $offset
 	 * @return array an array of user ids
 	 */
-	public function usersInGroup($gid, $search='', $limit=null, $offset=null) {
+	public function usersInGroup($gid, $search = '', $limit = null, $offset = null) {
 		$qb = $this->db->getQueryBuilder();
 
 		$qb->select('uid')
@@ -155,22 +155,45 @@ class GroupBackend extends ABackend {
 
 		if ($result['status'] == 200) {
 			$groups = json_decode($result['response']);
-			$this->db->query('DELETE FROM ' . $this->db->getPrefix() . $this->table);
+			$deleteGroups = $this->getGroups();
+
 			foreach($groups as $group) {
 				$gid = $group->name;
+                $deleteGroups = array_values(array_diff($deleteGroups, [$gid]));
 
 				$members = array_unique($group->members);
+				$deleteMembers = $this->usersInGroup($gid);
 
 				foreach($members as $uid) {
+                	$deleteMembers = array_values(array_diff($deleteMembers, [$uid]));
+					if (!$this->inGroup($uid, $gid)) {
+						$qb = $this->db->getQueryBuilder();
+						$qb->insert($this->table)
+							->values([
+								'uid' => $qb->createNamedParameter($uid),
+								'gid' => $qb->createNamedParameter($gid),
+							]);
+						$qb->execute();
+					}
+				}
+
+				foreach($deleteMembers as $uid) {
+                	$this->logger->debug('Deleting user ' . $uid . ' from ' . $gid, array('app' => $this->appName));
 					$qb = $this->db->getQueryBuilder();
-					$qb->insert($this->table)
-						->values([
-							'uid' => $qb->createNamedParameter($uid),
-							'gid' => $qb->createNamedParameter($gid),
-						]);
+					$qb->delete($this->table)
+						->where($qb->expr()->eq('uid', $qb->createNamedParameter($uid)))
+						->where($qb->expr()->eq('gid', $qb->createNamedParameter($gid)));
 					$qb->execute();
 				}
 			}
+
+            foreach($deleteGroups as $gid) {
+                $this->logger->debug('Deleting group ' . $gid, array('app' => $this->appName));
+                $qb = $this->db->getQueryBuilder();
+		        $qb->delete($this->table)
+		            ->where($qb->expr()->eq('gid', $qb->createNamedParameter($gid)));
+		        $result = $qb->execute();
+            }
 		} else {
 			$this->logger->error('Updating groups failed, error from server', array('app' => $this->appName));
 		}
