@@ -5,198 +5,198 @@ use OCP\Group\Backend\ABackend;
 use OCA\ConcrexitAuth\ApiUtil;
 
 class GroupBackend extends ABackend {
-	private $config;
-	private $groupManager;
-	private $logger;
-	private $db;
-	private $appName;
-	private $host;
-	private $table;
+    private $config;
+    private $groupManager;
+    private $logger;
+    private $db;
+    private $appName;
+    private $host;
+    private $table;
 
-	/**
-	 * Create new concrexit group backend
-	 */
-	public function __construct($config, $groupManager, $logger, $db, $jobList, $appName) {
-		$this->config = $config;
-		$this->groupManager = $groupManager;
+    /**
+     * Create new concrexit group backend
+     */
+    public function __construct($config, $groupManager, $logger, $db, $jobList, $appName) {
+        $this->config = $config;
+        $this->groupManager = $groupManager;
         $this->logger = $logger;
         $this->appName = $appName;
         $this->db = $db;
         $this->host = $config->getSystemValue('concrexit', array('host' => 'https://thalia.nu'))['host'];
         $this->table = 'groups_concrexit';
-	}
+    }
 
-	public function init() {
+    public function init() {
         $this->groupManager->addBackend($this);
-	}
+    }
 
-	/**
-	 * is user in group?
-	 * @param string $uid uid of the user
-	 * @param string $gid gid of the group
-	 * @return bool
-	 *
-	 * Checks whether the user is member of a group or not.
-	 */
-	public function inGroup($uid, $gid) {
-		$qb = $this->db->getQueryBuilder();
-		$qb->select($qb->func()->count('*'))
-			->from($this->table)
-			->where($qb->expr()->eq('uid', $qb->createNamedParameter($uid)))
-			->where($qb->expr()->eq('gid', $qb->createNamedParameter($gid)));
-		$result = $qb->execute();
-		return $result->fetchColumn() > 0;
-	}
+    /**
+     * is user in group?
+     * @param string $uid uid of the user
+     * @param string $gid gid of the group
+     * @return bool
+     *
+     * Checks whether the user is member of a group or not.
+     */
+    public function inGroup($uid, $gid) {
+        $qb = $this->db->getQueryBuilder();
+        $qb->select($qb->func()->count('*'))
+            ->from($this->table)
+            ->where($qb->expr()->eq('uid', $qb->createNamedParameter($uid)))
+            ->where($qb->expr()->eq('gid', $qb->createNamedParameter($gid)));
+        $result = $qb->execute();
+        return $result->fetchColumn() > 0;
+    }
 
-	/**
-	 * Get all groups a user belongs to
-	 * @param string $uid Name of the user
-	 * @return array an array of group names
-	 *
-	 * This function fetches all groups a user belongs to. It does not check
-	 * if the user exists at all.
-	 */
-	public function getUserGroups($uid) {
-		$qb = $this->db->getQueryBuilder();
-		$qb->select('gid')
-			->from($this->table)
-			->where($qb->expr()->eq('uid', $qb->createNamedParameter($uid)));
+    /**
+     * Get all groups a user belongs to
+     * @param string $uid Name of the user
+     * @return array an array of group names
+     *
+     * This function fetches all groups a user belongs to. It does not check
+     * if the user exists at all.
+     */
+    public function getUserGroups($uid) {
+        $qb = $this->db->getQueryBuilder();
+        $qb->select('gid')
+            ->from($this->table)
+            ->where($qb->expr()->eq('uid', $qb->createNamedParameter($uid)));
 
-		$result = $qb->execute()->fetchAll();
-		$groups = array_column($result, 'gid');
+        $result = $qb->execute()->fetchAll();
+        $groups = array_column($result, 'gid');
 
-		return $groups;
-	}
+        return $groups;
+    }
 
-	/**
-	 * get a list of all groups
-	 * @param string $search
-	 * @param int $limit
-	 * @param int $offset
-	 * @return array an array of group names
-	 *
-	 * Returns a list with all groups
-	 */
-	public function getGroups($search = '', $limit = null, $offset = null) {
-		$qb = $this->db->getQueryBuilder();
+    /**
+     * get a list of all groups
+     * @param string $search
+     * @param int $limit
+     * @param int $offset
+     * @return array an array of group names
+     *
+     * Returns a list with all groups
+     */
+    public function getGroups($search = '', $limit = null, $offset = null) {
+        $qb = $this->db->getQueryBuilder();
 
-		$qb->selectDistinct('gid')
-			->from($this->table)
-			->where($qb->expr()->iLike('gid', $qb->createPositionalParameter('%' . $this->db->escapeLikeParameter($search) . '%')))
-			->orderBy('gid', 'ASC')
-			->setMaxResults($limit)
-			->setFirstResult($offset);
+        $qb->selectDistinct('gid')
+            ->from($this->table)
+            ->where($qb->expr()->iLike('gid', $qb->createPositionalParameter('%' . $this->db->escapeLikeParameter($search) . '%')))
+            ->orderBy('gid', 'ASC')
+            ->setMaxResults($limit)
+            ->setFirstResult($offset);
 
-		$result = $qb->execute()->fetchAll();
-		$groups = array_column($result, 'gid');
+        $result = $qb->execute()->fetchAll();
+        $groups = array_column($result, 'gid');
 
-		$this->logger->debug('Groups loaded ' . json_encode($groups), array('app' => $this->appName));
+        $this->logger->debug('Groups loaded ' . json_encode($groups), array('app' => $this->appName));
 
-		return $groups;
+        return $groups;
 
-	}
+    }
 
-	/**
-	 * check if a group exists
-	 * @param string $gid
-	 * @return bool
-	 */
-	public function groupExists($gid) {
-		$qb = $this->db->getQueryBuilder();
-		$qb->select($qb->func()->count('*'))
-			->from($this->table)
-			->where($qb->expr()->eq('gid', $qb->createNamedParameter($gid)));
-		$result = $qb->execute();
-		return $result->fetchColumn() > 0;
-	}
+    /**
+     * check if a group exists
+     * @param string $gid
+     * @return bool
+     */
+    public function groupExists($gid) {
+        $qb = $this->db->getQueryBuilder();
+        $qb->select($qb->func()->count('*'))
+            ->from($this->table)
+            ->where($qb->expr()->eq('gid', $qb->createNamedParameter($gid)));
+        $result = $qb->execute();
+        return $result->fetchColumn() > 0;
+    }
 
-	/**
-	 * get a list of all users in a group
-	 * @param string $gid
-	 * @param string $search
-	 * @param int $limit
-	 * @param int $offset
-	 * @return array an array of user ids
-	 */
-	public function usersInGroup($gid, $search = '', $limit = null, $offset = null) {
-		$qb = $this->db->getQueryBuilder();
+    /**
+     * get a list of all users in a group
+     * @param string $gid
+     * @param string $search
+     * @param int $limit
+     * @param int $offset
+     * @return array an array of user ids
+     */
+    public function usersInGroup($gid, $search = '', $limit = null, $offset = null) {
+        $qb = $this->db->getQueryBuilder();
 
-		$qb->select('uid')
-			->from($this->table)
-			->where($qb->expr()->eq('gid', $qb->createNamedParameter($gid)))
-			->orderBy('uid', 'ASC')
-			->setMaxResults($limit)
-			->setFirstResult($offset);
+        $qb->select('uid')
+            ->from($this->table)
+            ->where($qb->expr()->eq('gid', $qb->createNamedParameter($gid)))
+            ->orderBy('uid', 'ASC')
+            ->setMaxResults($limit)
+            ->setFirstResult($offset);
 
-		if ($search !== '') {
-			$qb->andWhere($qb->expr()->iLike('uid', $qb->createNamedParameter(
-				'%' . $this->db->escapeLikeParameter($search) . '%'
-			)));
-		}
+        if ($search !== '') {
+            $qb->andWhere($qb->expr()->iLike('uid', $qb->createNamedParameter(
+                '%' . $this->db->escapeLikeParameter($search) . '%'
+            )));
+        }
 
-		$result = $qb->execute()->fetchAll();
-		$users = array_column($result, 'uid');
+        $result = $qb->execute()->fetchAll();
+        $users = array_column($result, 'uid');
 
-		return $users;
-	}
+        return $users;
+    }
 
-	/**
-	 * Update the groups from concrexit
-	 */
-	public function updateGroups() {
-		$this->logger->debug('Updating groups', array('app' => $this->appName));
+    /**
+     * Update the groups from concrexit
+     */
+    public function updateGroups() {
+        $this->logger->debug('Updating groups', array('app' => $this->appName));
 
-		$secret = $this->config->getSystemValue('concrexit', array('secret' => ''))['secret'];
-		$result = ApiUtil::doRequest(
-			$this->host,
-			'activemembers/nextcloud/groups/',
-			array('Authorization: Secret ' . $secret)
-		);
+        $secret = $this->config->getSystemValue('concrexit', array('secret' => ''))['secret'];
+        $result = ApiUtil::doRequest(
+            $this->host,
+            'activemembers/nextcloud/groups/',
+            array('Authorization: Secret ' . $secret)
+        );
 
-		if ($result['status'] == 200) {
-			$groups = json_decode($result['response']);
-			$deleteGroups = $this->getGroups();
+        if ($result['status'] == 200) {
+            $groups = json_decode($result['response']);
+            $deleteGroups = $this->getGroups();
 
-			foreach($groups as $group) {
-				$gid = $group->name;
+            foreach($groups as $group) {
+                $gid = $group->name;
                 $deleteGroups = array_values(array_diff($deleteGroups, [$gid]));
 
-				$members = array_unique($group->members);
-				$deleteMembers = $this->usersInGroup($gid);
+                $members = array_unique($group->members);
+                $deleteMembers = $this->usersInGroup($gid);
 
-				foreach($members as $uid) {
-                	$deleteMembers = array_values(array_diff($deleteMembers, [$uid]));
-					if (!$this->inGroup($uid, $gid)) {
-						$qb = $this->db->getQueryBuilder();
-						$qb->insert($this->table)
-							->values([
-								'uid' => $qb->createNamedParameter($uid),
-								'gid' => $qb->createNamedParameter($gid),
-							]);
-						$qb->execute();
-					}
-				}
+                foreach($members as $uid) {
+                    $deleteMembers = array_values(array_diff($deleteMembers, [$uid]));
+                    if (!$this->inGroup($uid, $gid)) {
+                        $qb = $this->db->getQueryBuilder();
+                        $qb->insert($this->table)
+                            ->values([
+                                'uid' => $qb->createNamedParameter($uid),
+                                'gid' => $qb->createNamedParameter($gid),
+                            ]);
+                        $qb->execute();
+                    }
+                }
 
-				foreach($deleteMembers as $uid) {
-                	$this->logger->debug('Deleting user ' . $uid . ' from ' . $gid, array('app' => $this->appName));
-					$qb = $this->db->getQueryBuilder();
-					$qb->delete($this->table)
-						->where($qb->expr()->eq('uid', $qb->createNamedParameter($uid)))
-						->where($qb->expr()->eq('gid', $qb->createNamedParameter($gid)));
-					$qb->execute();
-				}
-			}
+                foreach($deleteMembers as $uid) {
+                    $this->logger->debug('Deleting user ' . $uid . ' from ' . $gid, array('app' => $this->appName));
+                    $qb = $this->db->getQueryBuilder();
+                    $qb->delete($this->table)
+                        ->where($qb->expr()->eq('uid', $qb->createNamedParameter($uid)))
+                        ->where($qb->expr()->eq('gid', $qb->createNamedParameter($gid)));
+                    $qb->execute();
+                }
+            }
 
             foreach($deleteGroups as $gid) {
                 $this->logger->debug('Deleting group ' . $gid, array('app' => $this->appName));
                 $qb = $this->db->getQueryBuilder();
-		        $qb->delete($this->table)
-		            ->where($qb->expr()->eq('gid', $qb->createNamedParameter($gid)));
-		        $result = $qb->execute();
+                $qb->delete($this->table)
+                    ->where($qb->expr()->eq('gid', $qb->createNamedParameter($gid)));
+                $result = $qb->execute();
             }
-		} else {
-			$this->logger->error('Updating groups failed, error from server', array('app' => $this->appName));
-		}
-	}
+        } else {
+            $this->logger->error('Updating groups failed, error from server', array('app' => $this->appName));
+        }
+    }
 
 }
