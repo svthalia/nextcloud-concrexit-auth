@@ -6,10 +6,9 @@ use OCP\Group\Backend\ICountUsersBackend;
 use OCP\Group\Backend\IGroupDetailsBackend;
 use OCP\Group\Backend\IAddToGroupBackend;
 use OCP\Group\Backend\IRemoveFromGroupBackend;
-use OCP\Group\Backend\IIsAdminBackend;
 use OCA\ConcrexitAuth\ApiUtil;
 
-class GroupBackend extends ABackend implements ICountUsersBackend, IGroupDetailsBackend, IAddToGroupBackend, IRemoveFromGroupBackend, IIsAdminBackend {
+class GroupBackend extends ABackend implements ICountUsersBackend, IGroupDetailsBackend, IAddToGroupBackend, IRemoveFromGroupBackend {
     private $config;
     private $groupManager;
     private $logger;
@@ -197,14 +196,6 @@ class GroupBackend extends ABackend implements ICountUsersBackend, IGroupDetails
     }
 
     /**
-     * get admin status of user
-     * @return bool
-     */
-    public function isAdmin(string $uid): bool {
-        return $this->inGroup($uid, 'concrexit_-1');
-    }
-
-    /**
      * Add a user to a group
      * @param string $uid ID of the user to add to group
      * @param string $gid ID of the group in which add the user
@@ -246,6 +237,10 @@ class GroupBackend extends ABackend implements ICountUsersBackend, IGroupDetails
 
     private function storeGroup($group) {
         $gid = 'concrexit_' . ((string)$group->pk);
+        if ($group->pk === -1) {
+            $gid = 'admin';
+        }
+
         if (!$this->groupExists($gid)) {
             $qb = $this->db->getQueryBuilder();
             $qb->insert($this->groupsTable)
