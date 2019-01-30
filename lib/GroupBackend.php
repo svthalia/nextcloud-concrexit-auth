@@ -318,6 +318,10 @@ class GroupBackend extends ABackend implements ICountUsersBackend, IGroupDetails
                 $qb->delete($this->groupsTable)
                     ->where($qb->expr()->eq('gid', $qb->createNamedParameter($gid)));
                 $result = $qb->execute();
+                $qb = $this->db->getQueryBuilder();
+                $qb->delete($this->membershipTable)
+                    ->where($qb->expr()->eq('gid', $qb->createNamedParameter($gid)));
+                $qb->execute();
             }
         } else {
             $this->logger->error('Updating groups failed, error from server', array('app' => $this->appName));
