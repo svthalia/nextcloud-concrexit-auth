@@ -3,12 +3,11 @@ namespace OCA\ConcrexitAuth;
 
 use OCP\Group\Backend\ABackend;
 use OCP\Group\Backend\ICountUsersBackend;
-use OCP\Group\Backend\IGroupDetailsBackend;
 use OCP\Group\Backend\IAddToGroupBackend;
 use OCP\Group\Backend\IRemoveFromGroupBackend;
 use OCA\ConcrexitAuth\ApiUtil;
 
-class GroupBackend extends ABackend implements ICountUsersBackend, IGroupDetailsBackend, IAddToGroupBackend, IRemoveFromGroupBackend {
+class GroupBackend extends ABackend implements ICountUsersBackend, IAddToGroupBackend, IRemoveFromGroupBackend {
     private $config;
     private $groupManager;
     private $logger;
@@ -171,28 +170,6 @@ class GroupBackend extends ABackend implements ICountUsersBackend, IGroupDetails
             $count = 0;
         }
         return $count;
-    }
-
-    /**
-     * get the details of the group
-     * @param string $gid
-     * @return array
-     */
-    public function getGroupDetails(string $gid) : array {
-        if (strpos($gid, 'concrexit_') === 0) {
-            $qb = $this->db->getQueryBuilder();
-            $qb->select('name')
-                ->from($this->groupsTable)
-                ->where($qb->expr()->eq('gid', $qb->createNamedParameter($gid)));
-            $result = $qb->execute();
-            $data = $result->fetchColumn();
-            $result->closeCursor();
-
-            if ($data !== false) {
-                return ['displayName' => $data];
-            }
-        }
-        return [];
     }
 
     /**
