@@ -3,13 +3,11 @@ namespace OCA\ConcrexitAuth;
 
 use OCP\Group\Backend\ABackend;
 use OCP\Group\Backend\ICountUsersBackend;
-use OCP\Group\Backend\IGroupDetailsBackend;
 use OCP\Group\Backend\IAddToGroupBackend;
 use OCP\Group\Backend\IRemoveFromGroupBackend;
-use OCP\Group\Backend\IIsAdminBackend;
 use OCA\ConcrexitAuth\ApiUtil;
 
-class GroupBackend extends ABackend implements ICountUsersBackend, IGroupDetailsBackend, IAddToGroupBackend, IRemoveFromGroupBackend, IIsAdminBackend {
+class GroupBackend extends ABackend implements ICountUsersBackend, IAddToGroupBackend, IRemoveFromGroupBackend {
     private $config;
     private $groupManager;
     private $logger;
@@ -175,36 +173,6 @@ class GroupBackend extends ABackend implements ICountUsersBackend, IGroupDetails
     }
 
     /**
-     * get the details of the group
-     * @param string $gid
-     * @return array
-     */
-    public function getGroupDetails(string $gid) : array {
-        if (strpos($gid, 'concrexit_') === 0) {
-            $qb = $this->db->getQueryBuilder();
-            $qb->select('name')
-                ->from($this->groupsTable)
-                ->where($qb->expr()->eq('gid', $qb->createNamedParameter($gid)));
-            $result = $qb->execute();
-            $data = $result->fetchColumn();
-            $result->closeCursor();
-
-            if ($data !== false) {
-                return ['displayName' => $data];
-            }
-        }
-        return [];
-    }
-
-    /**
-     * get admin status of user
-     * @return bool
-     */
-    public function isAdmin(string $uid): bool {
-        return $this->inGroup($uid, 'concrexit_-1');
-    }
-
-    /**
      * Add a user to a group
      * @param string $uid ID of the user to add to group
      * @param string $gid ID of the group in which add the user
@@ -245,7 +213,7 @@ class GroupBackend extends ABackend implements ICountUsersBackend, IGroupDetails
     }
 
     private function storeGroup($group) {
-        $gid = 'concrexit_' . ((string)$group->pk);
+        $gid = $group->name;
         if (!$this->groupExists($gid)) {
             $qb = $this->db->getQueryBuilder();
             $qb->insert($this->groupsTable)
@@ -327,6 +295,10 @@ class GroupBackend extends ABackend implements ICountUsersBackend, IGroupDetails
                 $qb->delete($this->groupsTable)
                     ->where($qb->expr()->eq('gid', $qb->createNamedParameter($gid)));
                 $result = $qb->execute();
+                $qb = $this->db->getQueryBuilder();
+                $qb->delete($this->membershipTable)
+                    ->where($qb->expr()->eq('gid', $qb->createNamedParameter($gid)));
+                $qb->execute();
             }
         } else {
             $this->logger->error('Updating groups failed, error from server', array('app' => $this->appName));
