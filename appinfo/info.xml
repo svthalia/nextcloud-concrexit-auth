@@ -4,7 +4,7 @@
     <id>concrexitauth</id>
     <name>Concrexit Auth</name>
     <namespace>ConcrexitAuth</namespace>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <author mail="se_bastiaan@outlook.com" >Sébastiaan Versteeg</author>
     <category>security</category>
     <bugs>https://github.com/thaliawww/nextcloud-concrexit-auth</bugs>
