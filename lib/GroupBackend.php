@@ -236,11 +236,7 @@ class GroupBackend extends ABackend implements ICountUsersBackend, IGroupDetails
     }
 
     private function storeGroup($group) {
-        $gid = 'concrexit_' . ((string)$group->pk);
-        if ($group->pk === -1) {
-            $gid = 'admin';
-        }
-
+        $gid = $group->name;
         if (!$this->groupExists($gid)) {
             $qb = $this->db->getQueryBuilder();
             $qb->insert($this->groupsTable)
