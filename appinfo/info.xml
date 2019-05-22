@@ -10,6 +10,7 @@
     <bugs>https://github.com/thaliawww/nextcloud-concrexit-auth</bugs>
     <dependencies>
         <nextcloud min-version="14" max-version="16"/>
+        <database min-version="10.5">pgsql</database>
     </dependencies>
     <types>
         <authentication/>
