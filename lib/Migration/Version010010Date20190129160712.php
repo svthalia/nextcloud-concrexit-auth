@@ -32,27 +32,20 @@ class Version010010Date20190129160712 extends SimpleMigrationStep {
 	public function changeSchema(IOutput $output, Closure $schemaClosure, array $options) {
 		/** @var ISchemaWrapper $schema */
 		$schema = $schemaClosure();
-
-		if ($schema->hasTable('groups_concrexit')) {
-			$schema->dropTable('groups_concrexit');
-		}
-
-		if (!$schema->hasTable('groups_concrexit')) {
-			$table = $schema->createTable('groups_concrexit');
-			$table->addColumn('gid', Type::STRING, [
-				'notnull' => true,
-				'length' => 64,
-				'default' => '',
-			]);
-			$table->addColumn('name', Type::STRING, [
-				'notnull' => true,
-				'length' => 64,
-				'default' => '',
-			]);
-			$table->setPrimaryKey(['gid']);
-		}
-
-		if (!$schema->hasTable('groups_memberships_concrexit')) {
+                
+                if ($schema->hasTable('groups_concrexit')){
+                    $table = $schema->getTable('groups_concrexit');
+                    if ($table->hasColumn('uid')){
+                        $table->dropColumn('uid');
+                        $table->addColumn('name', Type::STRING, [
+                            'notnull' => true,
+                            'length' => 64,
+                            'default' => '',
+                        ]);
+                    }
+                }
+                
+                if (!$schema->hasTable('groups_memberships_concrexit')) {
 			$table = $schema->createTable('groups_memberships_concrexit');
 			$table->addColumn('gid', Type::STRING, [
 				'notnull' => true,
