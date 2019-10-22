@@ -72,7 +72,7 @@ class UserBackend extends ABackend implements ICheckPasswordBackend, IGetDisplay
         if ($this->userExists($uid)) {
             $result = ApiUtil::doRequest(
                 $this->host,
-                'token-auth',
+                'token-auth/',
                 array('Content-Type: application/json'),
                 json_encode(array(
                     'username' => $uid,
